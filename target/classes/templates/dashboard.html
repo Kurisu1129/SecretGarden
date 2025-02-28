@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>代理服务器仪表板</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="container mt-4">
+        <h1 class="mb-4">代理服务器仪表板</h1>
+        
+        <!-- 系统状态卡片 -->
+        <div class="row mb-4">
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">总用户数</h5>
+                        <p class="card-text" id="totalUsers">加载中...</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">活跃用户数</h5>
+                        <p class="card-text" id="activeUsers">加载中...</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">总流量</h5>
+                        <p class="card-text" id="totalTraffic">加载中...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 用户流量图表 -->
+        <div class="row mb-4">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">用户流量统计</h5>
+                        <canvas id="userTrafficChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 用户详细信息表格 -->
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">用户详细信息</h5>
+                        <div class="table-responsive">
+                            <table class="table" id="userTable">
+                                <thead>
+                                    <tr>
+                                        <th>用户名</th>
+                                        <th>上传流量</th>
+                                        <th>下载流量</th>
+                                        <th>请求次数</th>
+                                        <th>操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 格式化字节数
+        function formatBytes(bytes) {
+            if (bytes === 0) return '0 B';
+            const k = 1024;
+            const sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        // 加载系统状态
+        function loadSystemStats() {
+            fetch('/api/stats/system')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('totalUsers').textContent = data.totalUsers;
+                    document.getElementById('activeUsers').textContent = data.activeUsers;
+                    document.getElementById('totalTraffic').textContent = formatBytes(data.totalTraffic.totalBytes);
+                });
+        }
+
+        // 加载用户流量统计
+        function loadUserStats() {
+            fetch('/api/stats/users')
+                .then(response => response.json())
+                .then(data => {
+                    // 更新表格
+                    const tbody = document.getElementById('userTable').getElementsByTagName('tbody')[0];
+                    tbody.innerHTML = '';
+                    data.forEach(user => {
+                        const row = tbody.insertRow();
+                        row.insertCell(0).textContent = user.username;
+                        row.insertCell(1).textContent = formatBytes(user.totalBytesUp);
+                        row.insertCell(2).textContent = formatBytes(user.totalBytesDown);
+                        row.insertCell(3).textContent = user.totalRequests;
+                        const actionCell = row.insertCell(4);
+                        actionCell.innerHTML = `<button class="btn btn-sm btn-primary" onclick="showUserDetails('${user.username}')">详情</button>`;
+                    });
+
+                    // 更新图表
+                    updateTrafficChart(data);
+                });
+        }
+
+        // 更新流量图表
+        function updateTrafficChart(data) {
+            const ctx = document.getElementById('userTrafficChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: data.map(user => user.username),
+                    datasets: [
+                        {
+                            label: '上传流量',
+                            data: data.map(user => user.totalBytesUp),
+                            backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                            borderColor: 'rgba(54, 162, 235, 1)',
+                            borderWidth: 1
+                        },
+                        {
+                            label: '下载流量',
+                            data: data.map(user => user.totalBytesDown),
+                            backgroundColor: 'rgba(255, 99, 132, 0.5)',
+                            borderColor: 'rgba(255, 99, 132, 1)',
+                            borderWidth: 1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return formatBytes(value);
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // 显示用户详情
+        function showUserDetails(username) {
+            // TODO: 实现用户详情弹窗
+            alert('显示用户 ' + username + ' 的详细信息');
+        }
+
+        // 页面加载完成后执行
+        document.addEventListener('DOMContentLoaded', function() {
+            loadSystemStats();
+            loadUserStats();
+            // 每30秒刷新一次数据
+            setInterval(() => {
+                loadSystemStats();
+                loadUserStats();
+            }, 30000);
+        });
+    </script>
+</body>
+</html> 

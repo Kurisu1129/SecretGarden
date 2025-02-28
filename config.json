@@ -1,0 +1,11 @@
+{
+    "port": 7890,
+    "bindAddress": "127.0.0.1",
+    "enableHttp": true,
+    "enableSocks": true,
+    "databaseConfig": {
+        "url": "jdbc:mysql://localhost:3306/proxy_db",
+        "username": "root",
+        "password": "your_password"
+    }
+} 
