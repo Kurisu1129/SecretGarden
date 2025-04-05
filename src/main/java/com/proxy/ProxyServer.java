@@ -2,9 +2,9 @@ package com.proxy;
 
 import com.proxy.handler.HttpProxyInitializer;
 import com.proxy.handler.SocksProxyInitializer;
-import com.proxy.service.impl.AccessControlServiceImpl;
-import com.proxy.service.impl.TrafficStatsServiceImpl;
-import com.proxy.service.impl.UserServiceImpl;
+import com.proxy.service.IUserService;
+import com.proxy.service.IAccessControlService;
+import com.proxy.service.ITrafficStatsService;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.EventLoopGroup;
@@ -14,8 +14,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
+import jakarta.annotation.PostConstruct;
+import jakarta.annotation.PreDestroy;
 import java.util.concurrent.CompletableFuture;
 
 @Component
@@ -27,13 +27,13 @@ public class ProxyServer {
     private int socksPort;
 
     @Autowired
-    private UserServiceImpl userService;
+    private IUserService userService;
 
     @Autowired
-    private AccessControlServiceImpl accessControlService;
+    private IAccessControlService accessControlService;
 
     @Autowired
-    private TrafficStatsServiceImpl trafficStatsService;
+    private ITrafficStatsService trafficStatsService;
 
     private EventLoopGroup bossGroup;
     private EventLoopGroup workerGroup;
@@ -97,4 +97,4 @@ public class ProxyServer {
             workerGroup.shutdownGracefully();
         }
     }
-} 
+}

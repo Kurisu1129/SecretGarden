@@ -3,6 +3,8 @@ package com.proxy.service.impl;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.proxy.entity.TrafficStats;
 import com.proxy.mapper.TrafficStatsMapper;
+import com.proxy.service.ITrafficStatsService;
+
 import org.springframework.stereotype.Service;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -11,8 +13,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@Service
-public class TrafficStatsServiceImpl extends ServiceImpl<TrafficStatsMapper, TrafficStats> {
+@Service("trafficStatsService")
+public class TrafficStatsServiceImpl extends ServiceImpl<TrafficStatsMapper, TrafficStats> implements ITrafficStatsService{
     private static final Logger logger = LogManager.getLogger(TrafficStatsServiceImpl.class);
 
     public void recordTraffic(Long userId, String targetHost, long bytesUp, long bytesDown) {

@@ -1,6 +1,6 @@
 package com.proxy.handler;
 
-import com.proxy.service.impl.UserServiceImpl;
+import com.proxy.service.IUserService;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.handler.codec.http.HttpHeaderNames;
@@ -9,18 +9,16 @@ import io.netty.handler.codec.http.HttpResponse;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.DefaultFullHttpResponse;
 import io.netty.handler.codec.http.HttpVersion;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
 public class AuthHandler extends ChannelInboundHandlerAdapter {
-    private static final Logger logger = LogManager.getLogger(AuthHandler.class);
-    private final UserServiceImpl userService;
+    private final IUserService userService;
+
     private String authenticatedUser;
 
-    public AuthHandler(UserServiceImpl userService) {
+    public AuthHandler(IUserService userService) {
         this.userService = userService;
     }
 
@@ -61,4 +59,4 @@ public class AuthHandler extends ChannelInboundHandlerAdapter {
     public String getAuthenticatedUser() {
         return authenticatedUser;
     }
-} 
+}

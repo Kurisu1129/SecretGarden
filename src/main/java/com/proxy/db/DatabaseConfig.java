@@ -2,17 +2,34 @@ package com.proxy.db;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
+
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
 import java.sql.Connection;
 import java.sql.SQLException;
 
+import javax.sql.DataSource;
+
+@Configuration
 public class DatabaseConfig {
     private static final Logger logger = LogManager.getLogger(DatabaseConfig.class);
-    private static HikariDataSource dataSource;
-
-    public static void initialize(String url, String username, String password) {
+    
+    @Value("${spring.datasource.url}")
+    private String url;
+    
+    @Value("${spring.datasource.username}")
+    private String username;
+    
+    @Value("${spring.datasource.password}")
+    private String password;
+    
+    @Bean
+    public DataSource dataSource() {
         HikariConfig config = new HikariConfig();
         config.setJdbcUrl(url);
         config.setUsername(username);
@@ -22,21 +39,15 @@ public class DatabaseConfig {
         config.setIdleTimeout(300000);
         config.setConnectionTimeout(20000);
 
-        dataSource = new HikariDataSource(config);
+        HikariDataSource dataSource = new HikariDataSource(config);
         
         // 初始化数据库表
-        initializeTables();
+        initializeTables(dataSource);
+        return dataSource;
     }
 
-    public static Connection getConnection() throws SQLException {
-        if (dataSource == null) {
-            throw new SQLException("Database not initialized");
-        }
-        return dataSource.getConnection();
-    }
-
-    private static void initializeTables() {
-        try (Connection conn = getConnection()) {
+    private void initializeTables(HikariDataSource dataSource) {
+        try (Connection conn = dataSource.getConnection()) {
             // 创建用户表
             conn.createStatement().execute(
                 "CREATE TABLE IF NOT EXISTS users (" +
@@ -79,10 +90,4 @@ public class DatabaseConfig {
             logger.error("Failed to initialize database tables", e);
         }
     }
-
-    public static void shutdown() {
-        if (dataSource != null) {
-            dataSource.close();
-        }
-    }
-} 
+}

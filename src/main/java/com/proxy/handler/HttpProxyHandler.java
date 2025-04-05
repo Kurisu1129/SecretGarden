@@ -1,8 +1,8 @@
 package com.proxy.handler;
 
-import com.proxy.service.impl.AccessControlServiceImpl;
-import com.proxy.service.impl.TrafficStatsServiceImpl;
-import com.proxy.service.impl.UserServiceImpl;
+import com.proxy.service.IAccessControlService;
+import com.proxy.service.ITrafficStatsService;
+import com.proxy.service.IUserService;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
@@ -14,22 +14,24 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 public class HttpProxyHandler extends ChannelInboundHandlerAdapter {
-    private static final Logger logger = LogManager.getLogger(HttpProxyHandler.class);
-    private final UserServiceImpl userService;
-    private final AccessControlServiceImpl accessControlService;
-    private final TrafficStatsServiceImpl trafficStatsService;
-    private Channel outboundChannel;
-    private String currentHost;
-    private long bytesUp;
-    private long bytesDown;
+    private final IUserService userService;
+    private final IAccessControlService accessControlService;
+    private final ITrafficStatsService trafficStatsService;
 
-    public HttpProxyHandler(UserServiceImpl userService, 
-                          AccessControlServiceImpl accessControlService,
-                          TrafficStatsServiceImpl trafficStatsService) {
+    public HttpProxyHandler(
+            IUserService userService,
+            IAccessControlService accessControlService,
+            ITrafficStatsService trafficStatsService) {
         this.userService = userService;
         this.accessControlService = accessControlService;
         this.trafficStatsService = trafficStatsService;
     }
+    private static final Logger logger = LogManager.getLogger(HttpProxyHandler.class);
+
+    private Channel outboundChannel;
+    private String currentHost;
+    private long bytesUp;
+    private long bytesDown;
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) {
@@ -144,4 +146,4 @@ public class HttpProxyHandler extends ChannelInboundHandlerAdapter {
             ctx.fireChannelRead(msg);
         }
     }
-} 
+}

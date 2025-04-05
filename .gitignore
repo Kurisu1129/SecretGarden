@@ -1,0 +1,21 @@
+# 编译输出目录
+target/
+
+# IDE 相关文件夹
+.idea/
+*.iml
+.vscode/
+.settings/
+.classpath
+.project
+
+# 日志文件
+logs/
+*.log
+
+# 配置文件（如果包含敏感信息）
+src/main/resources/application-prod.yml
+src/main/resources/application-dev.yml
+
+# 系统文件
+.DS_Store

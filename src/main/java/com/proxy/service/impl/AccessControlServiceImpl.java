@@ -3,12 +3,14 @@ package com.proxy.service.impl;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.proxy.entity.AccessRule;
 import com.proxy.mapper.AccessRuleMapper;
+import com.proxy.service.IAccessControlService;
+
 import org.springframework.stereotype.Service;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-@Service
-public class AccessControlServiceImpl extends ServiceImpl<AccessRuleMapper, AccessRule> {
+@Service("accessControlService")
+public class AccessControlServiceImpl extends ServiceImpl<AccessRuleMapper, AccessRule> implements IAccessControlService{
     private static final Logger logger = LogManager.getLogger(AccessControlServiceImpl.class);
 
     public boolean addRule(Long userId, String targetHost, boolean allowed) {

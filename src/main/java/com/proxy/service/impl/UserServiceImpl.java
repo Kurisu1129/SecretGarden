@@ -3,13 +3,15 @@ package com.proxy.service.impl;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.proxy.entity.User;
 import com.proxy.mapper.UserMapper;
+import com.proxy.service.IUserService;
+
 import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.stereotype.Service;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-@Service
-public class UserServiceImpl extends ServiceImpl<UserMapper, User> {
+@Service("userService")
+public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IUserService{
     private static final Logger logger = LogManager.getLogger(UserServiceImpl.class);
 
     public boolean createUser(String username, String password) {
