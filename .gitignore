@@ -1,5 +1,6 @@
 # 编译输出目录
-.target/
+target/
+*.class
 
 # IDE 相关文件夹
 .idea/
