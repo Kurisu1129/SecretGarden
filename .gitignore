@@ -1,5 +1,5 @@
 # 编译输出目录
-target/
+.target/
 
 # IDE 相关文件夹
 .idea/
